@@ -42,7 +42,7 @@ fi
 
 # 6. Clear Shell History, logs and APT cache to save space
 echo "--> Shrinking image size (logs and cache)..."
-history -c
+history -c && history -w && cat /dev/null > ~/.bash_history
 sudo apt-get clean
 sudo find /var/log -type f -exec truncate -s 0 {} \;
 

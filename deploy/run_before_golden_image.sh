@@ -21,16 +21,16 @@ EOF
 sudo netplan apply
 
 # 3. Wipe machine-id so it regenerates on student boot
-sudo truncate -s 0 /etc/machine-id
-sudo rm /var/lib/dbus/machine-id
-sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
+# Using 'uninitialized' allows the system to generate a truly fresh ID on boot
+echo "uninitialized" | sudo tee /etc/machine-id
 
 # 4. Remove SSH Host keys
 # This ensures each robot generates its own unique SSH identity.
 sudo rm /etc/ssh/ssh_host_*
 
-# 5. Clear Shell History and logs
+# 5. Clear Shell History, logs and APT cache to save space
 history -c
+sudo apt-get clean
 sudo find /var/log -type f -exec truncate -s 0 {} \;
 
 echo "Master VM Prepared. Power off and export now."

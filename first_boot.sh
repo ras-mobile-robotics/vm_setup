@@ -40,8 +40,8 @@ while true; do
 done
 
 # Apply ROS_DOMAIN_ID to .bashrc (removes old entries first)
-sed -i '/ROS_DOMAIN_ID/d' ~/.bashrc
-echo "export ROS_DOMAIN_ID=$DOMAIN_ID" >> ~/.bashrc
+sed -i '/ROS_DOMAIN_ID/d' /home/ubuntu/.bashrc
+echo "export ROS_DOMAIN_ID=$DOMAIN_ID" >> /home/ubuntu/.bashrc
 
 # 4. Connect to WiFi
 echo "--> Attempting to connect to WiFi: $CLASS_SSID..."
@@ -50,7 +50,11 @@ sudo nmcli radio wifi on
 sudo nmcli device wifi rescan
 sudo nmcli device wifi connect "$CLASS_SSID" password "$CLASS_PASS"
 
-# 5. Connection Heartbeat (Wait for IP)
+# 5. Regenerate SSH Host Keys
+echo "--> Regenerating SSH Host Keys..."
+sudo ssh-keygen -A
+
+# 6. Connection Heartbeat (Wait for IP)
 echo "--> Verifying network connection..."
 SUCCESS=false
 for i in {1..15}; do
@@ -67,10 +71,6 @@ done
 if [ "$SUCCESS" = false ]; then
     echo "!! WARNING: Could not obtain an IP. Check your WiFi settings or router."
 fi
-
-# 6. Regenerate SSH Host Keys
-echo "--> Regenerating SSH Host Keys..."
-sudo ssh-keygen -A
 
 # 7. Final Summary and Reboot
 echo ""

@@ -33,12 +33,12 @@ sudo ln -sf /etc/machine-id /var/lib/dbus/machine-id
 echo "--> Removing SSH host keys..."
 sudo rm /etc/ssh/ssh_host_*
 
-# 5. Clean Cloud-Init (Specific to Ubuntu 24.04)
-# This prevents the VM from thinking it has already finished its first boot.
-if command -v cloud-init &> /dev/null; then
-    echo "--> Cleaning Cloud-Init state..."
-    sudo cloud-init clean --logs
-fi
+# 5. CLOUD-INIT REMOVAL (Replaces 'cloud-init clean') ---
+echo "--> Permanently removing Cloud-Init..."
+sudo apt-get purge -y cloud-init
+sudo rm -rf /etc/cloud/
+sudo rm -rf /var/lib/cloud/
+sudo rm -f /var/log/cloud-init*
 
 # 6. Clear Shell History, logs and APT cache to save space
 echo "--> Shrinking image size (logs and cache)..."

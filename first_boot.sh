@@ -68,7 +68,11 @@ if [ "$SUCCESS" = false ]; then
     echo "!! WARNING: Could not obtain an IP. Check your WiFi settings or router."
 fi
 
-# 6. Final Summary and Reboot
+# 6. Regenerate SSH Host Keys
+echo "--> Regenerating SSH Host Keys..."
+sudo ssh-keygen -A
+
+# 7. Final Summary and Reboot
 echo ""
 echo "====================================================="
 echo "SETUP SUMMARY:"

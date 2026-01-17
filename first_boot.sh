@@ -29,19 +29,19 @@ echo "--> Setting identity to $NEW_HOSTNAME..."
 sudo hostnamectl set-hostname "$NEW_HOSTNAME"
 sudo sed -i "s/127.0.1.1.*/127.0.1.1\t$NEW_HOSTNAME/g" /etc/hosts
 
-# 3. Get ROS_DOMAIN_ID (Validation: 0-101)
-while true; do
-    read -p "Enter your assigned ROS_DOMAIN_ID (0-101): " DOMAIN_ID
-    if [[ "$DOMAIN_ID" =~ ^[0-9]+$ ]] && [ "$DOMAIN_ID" -ge 0 ] && [ "$DOMAIN_ID" -le 101 ]; then
-        break
-    else
-        echo "Error: ROS_DOMAIN_ID must be a number between 0 and 101."
-    fi
-done
+# # 3. Get ROS_DOMAIN_ID (Validation: 0-101)
+# while true; do
+#     read -p "Enter your assigned ROS_DOMAIN_ID (0-101): " DOMAIN_ID
+#     if [[ "$DOMAIN_ID" =~ ^[0-9]+$ ]] && [ "$DOMAIN_ID" -ge 0 ] && [ "$DOMAIN_ID" -le 101 ]; then
+#         break
+#     else
+#         echo "Error: ROS_DOMAIN_ID must be a number between 0 and 101."
+#     fi
+# done
 
 # Apply ROS_DOMAIN_ID to .bashrc (removes old entries first)
-sed -i '/ROS_DOMAIN_ID/d' /home/ubuntu/.bashrc
-echo "export ROS_DOMAIN_ID=$DOMAIN_ID" >> /home/ubuntu/.bashrc
+# sed -i '/ROS_DOMAIN_ID/d' /home/eva/.bashrc
+# echo "export ROS_DOMAIN_ID=$DOMAIN_ID" >> /home/eva/.bashrc
 
 # 4. Connect to WiFi
 echo "--> Attempting to connect to WiFi: $CLASS_SSID..."

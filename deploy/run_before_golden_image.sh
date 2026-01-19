@@ -12,7 +12,7 @@ echo "--> Configuring universal Netplan..."
 cat <<EOF | sudo tee /etc/netplan/01-netcfg.yaml
 network:
   version: 2
-  renderer: networkd
+  renderer: NetworkManager
   ethernets:
     $INTERFACE:
       dhcp4: true
@@ -45,6 +45,9 @@ echo "--> Shrinking image size (logs and cache)..."
 history -c && history -w && cat /dev/null > ~/.bash_history
 sudo apt-get clean
 sudo find /var/log -type f -exec truncate -s 0 {} \;
+
+# 7. Set ROS2 env to sim
+set-ros-env sim
 
 echo "====================================================="
 echo "DONE: Master VM Prepared."

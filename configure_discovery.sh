@@ -186,10 +186,10 @@ setup_file="/etc/turtlebot4_discovery/setup.bash"
 sudo mv $setup_file_temp $setup_file
 
 # Source setup.bash in .bashrc
-if ! grep -Fq "source $setup_file" ~/.bashrc
-then
-    echo "source $setup_file" >> ~/.bashrc
-fi
+# if ! grep -Fq "source $setup_file" ~/.bashrc
+# then
+#     echo "source $setup_file" >> ~/.bashrc
+# fi
 
 if [ -f "/usr/local/sbin/ip_route.sh" ]||[ -f "/etc/systemd/system/ip_route.service" ];
 then

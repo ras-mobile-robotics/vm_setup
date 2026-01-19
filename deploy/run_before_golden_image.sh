@@ -47,6 +47,7 @@ sudo apt-get clean
 sudo find /var/log -type f -exec truncate -s 0 {} \;
 
 # 7. Set ROS2 env to sim
+source ~/vm_setup/robot_env_switcher.sh
 set-ros-env sim
 
 echo "====================================================="

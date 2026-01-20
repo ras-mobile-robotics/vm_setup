@@ -7,7 +7,7 @@ echo "====================================================="
 
 # 1. Get Student Number (Validation: 0-99)
 while true; do
-    read -p "Enter your assigned student number (0-99): " ST_NUM
+    read -p "Enter your assigned Lab Student ID (0-99): " ST_NUM
     if [[ "$ST_NUM" =~ ^[0-9]+$ ]] && [ "$ST_NUM" -ge 0 ] && [ "$ST_NUM" -le 99 ]; then
         break
     else

@@ -26,7 +26,7 @@ echo -e "$OK Language and Locales configured"
 echo -e "$INFO Configuring External Repositories..."
 
 # ROS 2
-sudo apt-get install -y -qq software-properties-common curl git > /dev/null
+sudo apt-get install -y -qq software-properties-common curl git wget unzip > /dev/null
 sudo add-apt-repository -y universe > /dev/null
 ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
 curl -sL -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
@@ -55,11 +55,11 @@ echo -e "$OK All repositories added"
 # 3. Main Application Installation
 echo -e "$INFO Installing System Tools, Desktop Apps, and CLI Utilities..."
 sudo apt-get install -y -qq \
-  apt-transport-https autojump bsdutils cmake code curl dash diffutils \
+  apt-transport-https bsdutils cmake code curl dash diffutils \
   efibootmgr fd-find findutils gparted grep gzip hostname init login \
   mesa-utils ncurses-base ncurses-bin openssh-server pkg-config \
   python3-colcon-clean python3-netifaces python3-pip ripgrep \
-  software-properties-common tilix tmux vim wget zsh \
+  software-properties-common tilix tmux vim zsh \
   open-vm-tools open-vm-tools-desktop spice-vdagent spice-webdavd \
   tailscale tailscale-archive-keyring > /dev/null
 echo -e "$OK Utilities and Desktop tools installed"
@@ -82,9 +82,55 @@ sudo apt-get install -y -qq \
   ros-jazzy-turtlebot4-node ros-jazzy-turtlebot4-simulator > /dev/null
 echo -e "$OK ROS 2 and Robotics stack installed"
 
+# 6. FastDDS Discovery Server Service
+echo -e "$INFO Configuring FastDDS Discovery Server..."
+SERVICE_FILE="/etc/systemd/system/fastdds-discovery.service"
+USER_NAME="eva"
 
+sudo bash -c "cat <<EOF > $SERVICE_FILE
+[Unit]
+Description=FastDDS Discovery Server for ROS 2 Simulation
+After=network.target
 
-# 6. Rosdep
+[Service]
+User=$USER_NAME
+Type=simple
+ExecStart=/bin/bash -c \"source /opt/ros/jazzy/setup.bash && /opt/ros/jazzy/bin/fast-discovery-server -i 0 -p 11811\"
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+
+sudo systemctl daemon-reload
+sudo systemctl enable fastdds-discovery.service
+sudo systemctl start fastdds-discovery.service
+echo -e "$OK FastDDS Discovery Server service started"
+
+# 7. CLI Power Tools (Autojump & FZF)
+echo -e "$INFO Installing Autojump and FZF..."
+cd /tmp
+git clone https://github.com/wting/autojump.git > /dev/null
+cd autojump
+./install.py > /dev/null
+cd ..
+
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf > /dev/null
+~/.fzf/install --all > /dev/null
+echo -e "$OK CLI tools configured"
+
+# 8. Nerd Fonts (JetBrains Mono)
+echo -e "$INFO Installing JetBrains Mono Nerd Font..."
+mkdir -p ~/.local/share/fonts
+wget -q -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+cd ~/.local/share/fonts
+unzip -o JetBrainsMono.zip > /dev/null
+rm JetBrainsMono.zip
+fc-cache -fv > /dev/null
+echo -e "$OK Fonts installed"
+
+# 9. Rosdep
 echo -e "$INFO Initializing Rosdep..."
 if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
     sudo rosdep init > /dev/null 2>&1 || true
@@ -92,24 +138,15 @@ fi
 rosdep update > /dev/null
 echo -e "$OK Rosdep initialized"
 
-# 7. Git Repo Setup
-# echo -e "$INFO Cloning vm_setup repository..."
-# if [ ! -d "$HOME/vm_setup" ]; then
-#     git clone https://github.com/ras-mobile-robotics/vm_setup "$HOME/vm_setup" > /dev/null
-#     echo -e "$OK Repository cloned to ~/vm_setup"
-# else
-#     echo -e "$INFO ~/vm_setup already exists, skipping clone."
-# fi
-
-# 8. Oh My Bash
+# 10. Oh My Bash
 echo -e "$INFO Installing Oh My Bash..."
 export CHSH=no
 export RUNZSH=no
 bash -c "$(wget https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh -O -)" --unattended > /dev/null 2>&1 || true
 echo -e "$OK Oh My Bash installed"
 
-# 9. Input Methods (IBus / Chewing)
-echo -e "$INFO Installing Input Methods and IBus tables..."
+# 11. Input Methods
+echo -e "$INFO Installing Input Methods..."
 sudo apt-get install -y -qq \
   ibus-table-cangjie-big ibus-table-cangjie3 ibus-table-cangjie5 \
   libchewing3 libchewing3-data libm17n-0 libmarisa0 libopencc-data \
@@ -119,7 +156,7 @@ echo -e "$OK Input methods installed"
 echo -e "\n\033[00;32m=======================================\033[0m"
 echo -e "\033[00;32m   FULL INSTALLATION SUCCESSFUL       \033[0m"
 echo -e "\033[00;32m=======================================\033[0m"
-echo -e "NOTE: Please REBOOT your VM to apply all changes."
+echo -e "NOTE: To use autojump, ensure you add '[ -f /home/$USER_NAME/.autojump/etc/profile.d/autojump.sh ] && . /home/$USER_NAME/.autojump/etc/profile.d/autojump.sh' to your .bashrc"
 
 read -p "Would you like to reboot now? (y/n) " -n 1 -r
 echo

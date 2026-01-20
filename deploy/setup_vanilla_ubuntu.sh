@@ -90,13 +90,13 @@ rosdep update > /dev/null
 echo -e "$OK Rosdep initialized"
 
 # 7. Git Repo Setup
-echo -e "$INFO Cloning vm_setup repository..."
-if [ ! -d "$HOME/vm_setup" ]; then
-    git clone https://github.com/ras-mobile-robotics/vm_setup "$HOME/vm_setup" > /dev/null
-    echo -e "$OK Repository cloned to ~/vm_setup"
-else
-    echo -e "$INFO ~/vm_setup already exists, skipping clone."
-fi
+# echo -e "$INFO Cloning vm_setup repository..."
+# if [ ! -d "$HOME/vm_setup" ]; then
+#     git clone https://github.com/ras-mobile-robotics/vm_setup "$HOME/vm_setup" > /dev/null
+#     echo -e "$OK Repository cloned to ~/vm_setup"
+# else
+#     echo -e "$INFO ~/vm_setup already exists, skipping clone."
+# fi
 
 # 8. Oh My Bash
 echo -e "$INFO Installing Oh My Bash..."

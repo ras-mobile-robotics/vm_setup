@@ -61,6 +61,7 @@ sudo apt-get install -y -qq \
   python3-colcon-clean python3-netifaces python3-pip ripgrep \
   software-properties-common tilix tmux vim zsh \
   open-vm-tools open-vm-tools-desktop spice-vdagent spice-webdavd \
+  python3-colcon-clean ntpdate \
   tailscale tailscale-archive-keyring > /dev/null
 echo -e "$OK Utilities and Desktop tools installed"
 

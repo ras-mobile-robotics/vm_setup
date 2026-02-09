@@ -49,6 +49,7 @@ echo "System config updated successfully."
 
 
 # 6. Set Robot Env in VM
+source /home/ubuntu/.bashrc
 set-ros-env robot
 ros2 daemon stop; sleep 2; ros2 daemon start
 

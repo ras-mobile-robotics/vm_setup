@@ -3,6 +3,9 @@
 # 1. Alias Setup
 grep -qxF 'source ~/vm_setup/alias.sh' ~/.bashrc || echo 'source ~/vm_setup/alias.sh' >> ~/.bashrc
 
+# Add robot env switcher
+grep -qxF 'source ~/vm_setup/robot_env_switcher.sh' ~/.bashrc || echo -e '\n# ROS 2 Environment Switcher\nsource ~/vm_setup/robot_env_switcher.sh' >> ~/.bashrc
+
 # 2. SSH Key Generation
 if [ ! -f ~/.ssh/id_ed25519 ]; then
     echo "--> Generating SSH keys..."

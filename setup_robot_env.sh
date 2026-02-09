@@ -47,14 +47,7 @@ sudo sed -i "s|^export ROS_DISCOVERY_SERVER=.*|export ROS_DISCOVERY_SERVER=\"$RO
 
 echo "System config updated successfully."
 
-
-# 6. Set Robot Env in VM
-shopt -s expand_aliases
-source ~/.bashrc
-set-ros-env robot
-ros2 daemon stop; sleep 2; ros2 daemon start
-
-# 7. Final Polish
+# 6. Final Polish
 source ~/.bashrc
 
 echo "================= SETUP COMPLETE ===================="

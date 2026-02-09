@@ -172,3 +172,61 @@ check-discovery-server() {
     # Ping 3 times max with a 1-second timeout per ping
     ping -c 3 -W 1 "$ds_ip"
 }
+
+# Check VM Setup
+check-vm() {
+    # --- CONFIGURATION ---
+    ROUTER_SUBNET="192.168.50"
+    SERVER_PORT="11811"
+
+    # Status Markers (Terminal Ticks/Crosses)
+    local TICK=$'\u2713'
+    local CROSS=$'\u2717'
+
+    # Dynamically find IP for hostname "turtlebot"
+    # 'getent hosts' checks /etc/hosts and DNS
+    TURTLEBOT_IP=$(getent hosts turtlebot | awk '{print $1}')
+
+    # Fallback check if the hostname couldn't be resolved
+    if [ -z "$TURTLEBOT_IP" ]; then
+        echo "[$CROSS] [ERROR] Could not resolve hostname 'turtlebot'."
+        echo "    Check /etc/hosts or ensure the robot is on the network."
+        return 1
+    fi
+    # -----------------------------
+
+    # 1. Check Network Mode
+    local VM_IP=$(hostname -I | awk '{print $1}')
+    if [[ $VM_IP == $ROUTER_SUBNET* ]]; then
+        echo " [$TICK] [NETWORK] Bridged Mode confirmed (IP: $VM_IP)"
+    else
+        echo " [$CROSS] [NETWORK] FAILED: VM is in NAT mode or wrong network."
+        echo "    Go to VMware Settings > Network > Bridged."
+        return 1
+    fi
+
+    # 2. Check Time Sync
+    if systemctl is-active --quiet chrony; then
+        local STRATUM=$(chronyc tracking | grep "Stratum" | awk '{print $3}')
+        if [ "$STRATUM" -lt 16 ]; then
+            echo "[$TICK] [TIME] Chrony is active and synced (Stratum: $STRATUM)"
+        else
+            echo "[$CROSS] [TIME] Chrony is active but NOT synced to a master."
+        fi
+    else
+        echo "[$CROSS] [TIME] Chrony is NOT running. Run: sudo apt install chrony"
+    fi
+
+    # 3. Check Robot Reachability
+    if ping -c 1 -W 1 $TURTLEBOT_IP &> /dev/null; then
+        echo "[$TICK] [ROBOT] Turtlebot ($TURTLEBOT_IP) is reachable."
+    else
+        echo "[$CROSS] [ROBOT] Cannot ping Turtlebot. Is it turned on?"
+    fi
+
+    echo "----------------------------------------"
+    echo "Computer IP = $VM_IP"
+    echo "Turtlebot IP = $TURTLEBOT_IP"
+    echo "ROS_DISCOVERY_SERVER = $ROS_DISCOVERY_SERVER"
+    echo "----------------------------------------"
+}

@@ -273,3 +273,24 @@ run-lab-rviz() {
         -r tf:="/${NS}/tf" \
         -r tf_static:="/${NS}/tf_static"
 }
+
+# Teleop with TF topic namespaced
+run-lab-teleop() {
+    # Check if ROS_DOMAIN_ID is set
+    if [ -z "$ROS_DOMAIN_ID" ]; then
+        echo "Error: ROS_DOMAIN_ID is not set."
+        return 1
+    fi
+
+    # Pad the Domain ID to 2 digits
+    local NS_NUM=$(printf "%02d" $ROS_DOMAIN_ID)
+    local NS="robot_${NS_NUM}"
+
+    echo "Detected Domain: $ROS_DOMAIN_ID"
+    echo "Launching Timestamped Teleop for Namespace: /$NS"
+
+    # Run teleop with topic remapping and stamped parameter enabled
+    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
+        -r cmd_vel:="/${NS}/cmd_vel" \
+        -p stamped:=true
+}

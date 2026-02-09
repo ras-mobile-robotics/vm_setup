@@ -2,7 +2,7 @@
 
 # 1. Alias Setup
 # Add "source ~/vm_setup/alias.zsh" to bashrc if it does not exist
-grep -qxF 'source ~/vm_setup/alias.zsh' ~/.bashrc || echo 'source ~/vm_setup/alias.zsh' >> ~/.bashrc
+grep -qxF 'source ~/vm_setup/alias.sh' ~/.bashrc || echo 'source ~/vm_setup/alias.sh' >> ~/.bashrc
 
 # 2. SSH Key Generation
 # Only generate if the key doesn't already exist to avoid overwriting
@@ -47,10 +47,15 @@ sudo sed -i "s|^export ROS_DISCOVERY_SERVER=.*|export ROS_DISCOVERY_SERVER=\"$RO
 
 echo "System config updated successfully."
 
-# 6. Final Polish
+
+# 6. Set Robot Env in VM
+set-ros-env robot
+ros2 daemon stop; sleep 2; ros2 daemon start
+
+# 7. Final Polish
 source ~/.bashrc
-echo "====================================================="
-echo "SETUP COMPLETE"
+
+echo "================= SETUP COMPLETE ===================="
 echo "Your ROS_DOMAIN_ID is set to: $ROBOT_ID"
 echo "You can now connect using: ssh ubuntu@$ROBOT_NAME"
 echo "====================================================="

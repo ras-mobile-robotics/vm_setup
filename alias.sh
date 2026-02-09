@@ -2,9 +2,6 @@
 alias sb="source ~/.bashrc"
 alias sw="source ~/ros2_ws/install/setup.bash"
 
-# Update Time
-alias sync-time="sudo ntpdate -u 0.ubuntu.pool.ntp.org"
-
 # Kill the ROS 2 daemon and restart it
 alias rd-restart='ros2 daemon stop; sleep 2; ros2 daemon start'
 
@@ -189,7 +186,7 @@ check-vm() {
 
     # Fallback check if the hostname couldn't be resolved
     if [ -z "$TURTLEBOT_IP" ]; then
-        echo "[$CROSS] [ERROR] Could not resolve hostname 'turtlebot'."
+        echo " [$CROSS] [ERROR] Could not resolve hostname 'turtlebot'."
         echo "    Check /etc/hosts or ensure the robot is on the network."
         return 1
     fi
@@ -229,4 +226,50 @@ check-vm() {
     echo "Turtlebot IP = $TURTLEBOT_IP"
     echo "ROS_DISCOVERY_SERVER = $ROS_DISCOVERY_SERVER"
     echo "----------------------------------------"
+}
+
+# Sync time
+sync-ntp-time() {
+    local TICK=$'\u2713'
+    local CROSS=$'\u2717'
+
+    echo "Stopping NTP service..."
+    sudo timedatectl set-ntp false
+    sleep 2
+
+    echo "Starting NTP service and fetching internet time..."
+    sudo timedatectl set-ntp true
+    
+    # "Settle" time: give the background daemon a moment to reach a server
+    echo "Settling..."
+    sleep 5 
+
+    # Check if successful
+    if timedatectl status | grep -q "System clock synchronized: yes"; then
+        echo "[$TICK] Time synchronized successfully!"
+        date
+    else
+        echo "[$CROSS] Sync failed. Check internet connection or 'systemd-timesyncd' logs."
+    fi
+}
+
+# Rviz with TF topic namespaced
+run-lab-rviz() {
+    # Check if ROS_DOMAIN_ID is set
+    if [ -z "$ROS_DOMAIN_ID" ]; then
+        echo "Error: ROS_DOMAIN_ID is not set."
+        return 1
+    fi
+
+    # Pad the Domain ID to 2 digits (e.g., 3 becomes 03)
+    local NS_NUM=$(printf "%02d" $ROS_DOMAIN_ID)
+    local NS="robot_${NS_NUM}"
+
+    echo "Detected Domain: $ROS_DOMAIN_ID"
+    echo "Launching RViz for Namespace: /$NS"
+
+    # Run RViz with remapped TF topics
+    ros2 run rviz2 rviz2 --ros-args \
+        -r tf:="/${NS}/tf" \
+        -r tf_static:="/${NS}/tf_static"
 }

@@ -299,12 +299,12 @@ run-lab-teleop() {
 battery-daemon-restart() {
     echo "Stopping existing Robot Status Daemon..."
     # -f matches the full command line, -9 is a forced kill
-    pkill -9 -f "robot_status_daemon.py" || echo "No running daemon found."
+    pkill -9 -f "robot_battery_daemon.py" || echo "No running daemon found."
 
     echo "Starting Robot Status Daemon in background..."
     # nohup keeps it alive after logout, & runs it in background
     # Redirecting output to /dev/null prevents 'nohup.out' files from cluttering your folders
-    nohup python3 ~/vm_setup/robot_status_daemon.py > /dev/null 2>&1 &
+    nohup python3 ~/vm_setup/robot_battery_daemon.py > /dev/null 2>&1 &
     
     # disown removes it from the current terminal's job list
     disown

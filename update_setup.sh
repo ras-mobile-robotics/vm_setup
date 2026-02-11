@@ -26,7 +26,7 @@ if [ -f "$SOURCE_FILE" ]; then
     # 4. Copy new tmux file
     cp ~/.tmux.conf ~/.tmux_$(date +%Y%m%d_%H%M%S) 
     rm ~/.tmux.conf
-    ln -sf $HOME/vm_setup/config/tmux.conf ~/.tmux.conf
+    ln -sf $HOME/vm_setup/config/.tmux.conf ~/.tmux.conf
 
     # 5. Append the comma-separated line to the state file
     # Format: hash, timestamp, bot_id, domain_id, discovery_server

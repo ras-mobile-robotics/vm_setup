@@ -24,7 +24,7 @@ if [ -f "$SOURCE_FILE" ]; then
     TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
     # 4. Copy new tmux file
-    cp ~/.tmux.conf ~/.tmux_$(date +%Y%m%d_%H%M%S) 
+    [ -f ~/.tmux.conf ] && cp ~/.tmux.conf ~/.tmux_$(date +%Y%m%d_%H%M%S)
     rm -f ~/.tmux.conf
     ln -sf $HOME/vm_setup/config/.tmux.conf ~/.tmux.conf
 

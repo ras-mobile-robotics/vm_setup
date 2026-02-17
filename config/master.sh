@@ -7,7 +7,7 @@ switch-robot() {
 
     # Format the ID with zero padding (e.g., 5 -> 05)
     local XX=$(printf "%02d" $1)
-    local FILE="/etc/turtlebot_discovery/setup.bash"
+    local FILE="/etc/turtlebot4_discovery/setup.bash"
 
     echo "Setting Robot ID to $1 (IP suffix .2$XX)..."
 
@@ -16,7 +16,7 @@ switch-robot() {
     sudo sed -i "s/export ROS_DISCOVERY_SERVER=.*/export ROS_DISCOVERY_SERVER=\"192.168.50.2$XX:11811\"/" $FILE
 
     # Write to domain ID file
-    echo $1 > ~/.domain_id
+    echo $1 >| ~/.domain_id
 
     # Source
     source $FILE

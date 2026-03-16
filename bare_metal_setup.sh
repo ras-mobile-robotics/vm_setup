@@ -43,6 +43,38 @@ export ROS_DOMAIN_ID=$ROBOT_ID
 export ROS_DISCOVERY_SERVER=\"$ROBOT_IP:11811\"
 EOF"
 
+
+# 5. FastDDS Discovery Server Service
+SERVICE_FILE="/etc/systemd/system/fastdds-discovery.service"
+# Captures the user who invoked the script, even if run with sudo
+LOGGED_IN_USER=$(whoami)
+
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo -e "$INFO Configuring FastDDS Discovery Server for user: $LOGGED_IN_USER..."
+
+    sudo bash -c "cat <<EOF > $SERVICE_FILE
+[Unit]
+Description=FastDDS Discovery Server for ROS 2 Simulation
+After=network.target
+
+[Service]
+User=$LOGGED_IN_USER
+Type=simple
+ExecStart=/bin/bash -c \"source /opt/ros/jazzy/setup.bash && /opt/ros/jazzy/bin/fast-discovery-server -i 0 -p 11811\"
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable fastdds-discovery.service
+    echo -e "$OK FastDDS Discovery Server service started for $LOGGED_IN_USER"
+else
+    echo -e "$INFO FastDDS Discovery Server service already exists. Skipping configuration."
+fi
+
 echo "================= SETUP COMPLETE ===================="
 echo "Your ROS_DOMAIN_ID is set to: $ROBOT_ID"
 echo "Your Discovery Server is: $ROBOT_IP:11811"
